@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/admin/admin_settings_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/section_picker_screen.dart';
 import '../../features/auth/signup_screen.dart';
@@ -12,6 +13,7 @@ import '../../features/auth/splash_screen.dart';
 import '../../features/bring_list/admin_categories_screen.dart';
 import '../../features/bring_list/bring_list_screen.dart';
 import '../../features/bring_list/my_items_screen.dart';
+import '../../features/eid_day/eid_day_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/placeholders/coming_soon_screen.dart';
 import '../../models/app_user.dart';
@@ -114,6 +116,16 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.myItems,
         builder: (BuildContext context, GoRouterState state) =>
             const MyItemsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminSettings,
+        builder: (BuildContext context, GoRouterState state) =>
+            const AdminSettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.eidDay,
+        builder: (BuildContext context, GoRouterState state) =>
+            const EidDayScreen(),
       ),
       GoRoute(
         path: AppRoutes.expenses,

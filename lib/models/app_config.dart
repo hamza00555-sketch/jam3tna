@@ -19,8 +19,18 @@ class CategoryQuota {
 
 class AppConfig {
   final String name;
-  final DateTime? eventDate;
+
+  /// تاريخ يوم العيد (لتشغيل التكبيرات والألعاب النارية).
+  final DateTime? eidDate;
+
+  /// تاريخ يوم الاستراحة العائلية (مختلف عن يوم العيد غالباً).
+  final DateTime? gatheringDate;
+
   final String? location;
+
+  /// إحداثيات الاستراحة "lat,lng" لرابط Maps.
+  final String? locationCoords;
+
   final List<String> admins;
   final String currency;
 
@@ -32,8 +42,10 @@ class AppConfig {
     required this.admins,
     required this.currency,
     required this.categoriesConfig,
-    this.eventDate,
+    this.eidDate,
+    this.gatheringDate,
     this.location,
+    this.locationCoords,
   });
 
   factory AppConfig.empty() => const AppConfig(
@@ -50,10 +62,16 @@ class AppConfig {
     final Map<String, dynamic> rawCats =
         (data['categoriesConfig'] as Map<String, dynamic>?) ??
             <String, dynamic>{};
+    // backward-compat: نقبل eventDate القديم كـ gatheringDate.
+    final DateTime? legacyEvent =
+        (data['eventDate'] as Timestamp?)?.toDate();
     return AppConfig(
       name: (data['name'] as String?) ?? 'جمعتنا',
-      eventDate: (data['eventDate'] as Timestamp?)?.toDate(),
+      eidDate: (data['eidDate'] as Timestamp?)?.toDate(),
+      gatheringDate:
+          (data['gatheringDate'] as Timestamp?)?.toDate() ?? legacyEvent,
       location: data['location'] as String?,
+      locationCoords: data['locationCoords'] as String?,
       admins: ((data['admins'] as List<dynamic>?) ?? <dynamic>[])
           .map((dynamic e) => e.toString())
           .toList(),
@@ -70,12 +88,37 @@ class AppConfig {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'name': name,
-      'eventDate': eventDate == null ? null : Timestamp.fromDate(eventDate!),
+      'eidDate': eidDate == null ? null : Timestamp.fromDate(eidDate!),
+      'gatheringDate':
+          gatheringDate == null ? null : Timestamp.fromDate(gatheringDate!),
       'location': location,
+      'locationCoords': locationCoords,
       'admins': admins,
       'currency': currency,
-      'categoriesConfig': categoriesConfig
-          .map((String k, CategoryQuota v) => MapEntry<String, dynamic>(k, v.toMap())),
+      'categoriesConfig': categoriesConfig.map(
+          (String k, CategoryQuota v) => MapEntry<String, dynamic>(k, v.toMap())),
     };
+  }
+
+  AppConfig copyWith({
+    String? name,
+    DateTime? eidDate,
+    DateTime? gatheringDate,
+    String? location,
+    String? locationCoords,
+    List<String>? admins,
+    String? currency,
+    Map<String, CategoryQuota>? categoriesConfig,
+  }) {
+    return AppConfig(
+      name: name ?? this.name,
+      eidDate: eidDate ?? this.eidDate,
+      gatheringDate: gatheringDate ?? this.gatheringDate,
+      location: location ?? this.location,
+      locationCoords: locationCoords ?? this.locationCoords,
+      admins: admins ?? this.admins,
+      currency: currency ?? this.currency,
+      categoriesConfig: categoriesConfig ?? this.categoriesConfig,
+    );
   }
 }

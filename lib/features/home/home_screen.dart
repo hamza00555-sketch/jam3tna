@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/routing/routes.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/date_utils.dart';
 import '../../models/app_config.dart';
 import '../../models/app_user.dart';
 import '../../models/item.dart';
@@ -15,19 +17,53 @@ import '../../widgets/eid_app_bar.dart';
 import 'widgets/eid_countdown_card.dart';
 import 'widgets/feature_card.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _autoOpenChecked = false;
+
+  Future<void> _maybeAutoOpenEidDay(DateTime? eidDate) async {
+    if (_autoOpenChecked) return;
+    _autoOpenChecked = true;
+    if (eidDate == null || !EidDateUtils.isToday(eidDate)) return;
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String todayKey =
+        '${eidDate.year}-${eidDate.month}-${eidDate.day}';
+    final String? shownFor = prefs.getString('eid_auto_shown_for');
+    if (shownFor == todayKey) return;
+    await prefs.setString('eid_auto_shown_for', todayKey);
+    if (!mounted) return;
+    // ندع الـ frame يكتمل قبل التنقّل.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.push(AppRoutes.eidDay);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AsyncValue<AppUser?> userAsync = ref.watch(currentUserProvider);
     final AsyncValue<AppConfig> configAsync = ref.watch(appConfigProvider);
     final AsyncValue<List<Item>> itemsAsync = ref.watch(allItemsProvider);
+
+    final AppConfig config = configAsync.value ?? AppConfig.empty();
+    _maybeAutoOpenEidDay(config.eidDate);
 
     return Scaffold(
       appBar: EidAppBar(
         title: 'جمعتنا',
         actions: <Widget>[
+          if (userAsync.value?.isAdmin ?? false)
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: 'إعدادات اللمَّة',
+              onPressed: () => context.push(AppRoutes.adminSettings),
+            ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'تسجيل الخروج',
@@ -44,8 +80,6 @@ class HomeScreen extends ConsumerWidget {
           if (user == null) {
             return const Center(child: Text('لا توجد بيانات.'));
           }
-          final AppConfig config =
-              configAsync.value ?? AppConfig.empty();
           final List<Item> allItems = itemsAsync.value ?? <Item>[];
           final int myClaimedCount =
               allItems.where((Item i) => i.claimedByUid == user.uid).length;
@@ -56,9 +90,11 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 EidCountdownCard(
-                  eventDate: config.eventDate,
+                  eidDate: config.eidDate,
+                  gatheringDate: config.gatheringDate,
                   displayName: user.displayName,
                   sectionLabel: user.section?.labelAr ?? '—',
+                  onTapEidDay: () => context.push(AppRoutes.eidDay),
                 ),
                 const SizedBox(height: 20),
                 if (myClaimedCount > 0) ...<Widget>[
@@ -70,7 +106,7 @@ class HomeScreen extends ConsumerWidget {
                 ],
                 const _SectionHeader(text: 'ميزات اللمَّة'),
                 const SizedBox(height: 12),
-                _FeaturesGrid(isAdmin: user.isAdmin),
+                const _FeaturesGrid(),
               ],
             ),
           );
@@ -191,8 +227,7 @@ class _MyItemsBanner extends StatelessWidget {
 }
 
 class _FeaturesGrid extends StatelessWidget {
-  const _FeaturesGrid({required this.isAdmin});
-  final bool isAdmin;
+  const _FeaturesGrid();
 
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,11 @@ import '../../features/auth/login_screen.dart';
 import '../../features/auth/section_picker_screen.dart';
 import '../../features/auth/signup_screen.dart';
 import '../../features/auth/splash_screen.dart';
+import '../../features/bring_list/admin_categories_screen.dart';
+import '../../features/bring_list/bring_list_screen.dart';
+import '../../features/bring_list/my_items_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/placeholders/coming_soon_screen.dart';
 import '../../models/app_user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/current_user_provider.dart';
@@ -95,6 +99,75 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.home,
         builder: (BuildContext context, GoRouterState state) =>
             const HomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.bringList,
+        builder: (BuildContext context, GoRouterState state) =>
+            const BringListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.bringListAdmin,
+        builder: (BuildContext context, GoRouterState state) =>
+            const AdminCategoriesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myItems,
+        builder: (BuildContext context, GoRouterState state) =>
+            const MyItemsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.expenses,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ComingSoonScreen(
+          title: 'المصاريف',
+          milestone: 'M3',
+          icon: Icons.account_balance_wallet_outlined,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.gallery,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ComingSoonScreen(
+          title: 'الصور',
+          milestone: 'M4',
+          icon: Icons.photo_library_outlined,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.voiceNotes,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ComingSoonScreen(
+          title: 'الأصوات',
+          milestone: 'M6',
+          icon: Icons.mic_none_outlined,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.pool,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ComingSoonScreen(
+          title: 'تصويت المسبح',
+          milestone: 'M5',
+          icon: Icons.pool_outlined,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.schedule,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ComingSoonScreen(
+          title: 'جدول اليوم',
+          milestone: 'M5',
+          icon: Icons.schedule,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ComingSoonScreen(
+          title: 'الإعدادات',
+          milestone: 'M5',
+          icon: Icons.settings_outlined,
+        ),
       ),
     ],
   );

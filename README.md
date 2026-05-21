@@ -4,15 +4,21 @@
 (٤ رجال + ٤ نساء + ٤ أطفال). يقسم الواجهات إلى قسم رجال/نساء ويغطي:
 قائمة الجلب، المصاريف، معرض الصور، Voice Notes، تصويت المسبح، جدول اليوم.
 
-## الحالة الحالية: M1 — التهيئة + المصادقة
+## الحالة الحالية: M2 — Home + Bring List
 
-تم إنجاز:
-- إعداد Flutter + Firebase (Auth/Firestore/Storage/Messaging).
-- Theme عيدي (أخضر زمردي + ذهبي + عاجي + خط Cairo).
-- Routing تصريحي عبر `go_router` مع حراس مصادقة.
-- شاشات: Splash, Login, Signup, SectionPicker, Home (placeholder).
-- خدمات: AuthService + FirestoreService.
-- Riverpod providers للمصادقة والمستخدم الحالي.
+**M1** ✅ — التهيئة + Theme + Routing + Auth + SectionPicker.
+
+**M2** ✅ — Home grid ببطاقات الميزات + Bring List هجين + إدارة الفئات:
+- شاشة Home: بطاقة عدّ تنازلي للعيد + 6 بطاقات ميزات + شريط "بنوديّ".
+- شاشة Bring List هجينة:
+  - فلاتر: قسمي / مشترك / كل القائمة.
+  - تجميع تلقائي حسب الفئة مع عدّاد محجوز/كلّي.
+  - حجز slot عبر **Firestore transaction** آمنة ضد race conditions.
+  - تعديل/إلغاء حجز (لصاحبه فقط).
+  - إضافة بنود حرّة خارج كوتا المشرف.
+- شاشة AdminCategories (للأدمن فقط): تحديد عدد البنود لكل فئة + القسم.
+- ItemsBootstrapService: توليد slots idempotent + حذف غير المحجوزة عند تقليل الكوتا.
+- شاشة "بنوديّ" تجمع كل ما حجزه المستخدم.
 
 ## التشغيل محلياً (مرّة واحدة)
 
@@ -109,7 +115,7 @@ lib/
 ## الخارطة (Roadmap)
 
 - ✅ **M1**: التهيئة + Theme + Routing + Auth + SectionPicker.
-- ⏳ **M2**: Home grid + Bring List (هجين) + إدارة الفئات + transactions.
+- ✅ **M2**: Home grid + Bring List (هجين) + إدارة الفئات + transactions.
 - ⏳ **M3**: المصاريف + التقسيم + رفع الفواتير.
 - ⏳ **M4**: معرض الصور + برواز عيدي.
 - ⏳ **M5**: تصويت المسبح + الجدول + الإعدادات.

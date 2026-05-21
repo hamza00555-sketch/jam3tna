@@ -44,7 +44,7 @@ enum ItemCategory {
   iceCream('iceCream', 'آيس كريم'),
   bread('bread', 'خبز'),
   sides('sides', 'أطباق جانبية'),
-  logistics('logistics', 'لوجستيات'),
+  logistics('logistics', 'تجهيزات'),
   other('other', 'أخرى');
 
   const ItemCategory(this.key, this.labelAr);
